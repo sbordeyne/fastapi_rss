@@ -37,7 +37,6 @@ class RSSFeed(BaseModel):
 
     item: List[Item] = []
 
-
     @staticmethod
     def generate_tree(root, dict_):  # TODO: improve that shiete
         for key, value in dict_.items():

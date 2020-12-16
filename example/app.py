@@ -33,7 +33,6 @@ async def root():
         ]
     }
     feed = RSSFeed(**feed_data)
-    print(feed)
     return RSSResponse(feed)
 
 
