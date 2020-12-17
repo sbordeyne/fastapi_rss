@@ -7,11 +7,23 @@ from starlette.responses import Response
 
 
 class RSSResponse(Response):
+    '''
+    A subclass of starlette.responses.Response which will set the content
+    to an RSS XML document. It takes one argument, an RSSFeed object which will
+    be converted to an XML document.
+    '''
     media_type = 'application/xml'
     charset = 'utf-8'
 
     @property
     def etag(self):
+        '''
+        Generates a SHA1 sum of the body of the response so that the server can
+        support the ETag protocol.
+
+        :return: The SHA1 hex digest of the body of the response
+        :rtype: str
+        '''
         return hashlib.sha1(self.body).hexdigest()
 
     def init_headers(self, headers: Mapping[str, str] = None) -> None:
