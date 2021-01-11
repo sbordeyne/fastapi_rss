@@ -53,14 +53,18 @@ class RSSFeed(BaseModel):
                         RSSFeed.generate_tree(itemroot, item)
                 continue
 
-            if isinstance(value, BaseModel):
+            if isinstance(value, BaseModel) or isinstance(value, dict):
                 if hasattr(value, 'attrs'):
                     attrs = value.attrs.dict()
+                elif 'attrs' in value:
+                    attrs = value['attrs']
                 else:
                     attrs = {}
 
                 if hasattr(value, 'content'):
                     content = value.content
+                elif 'content' in value:
+                    content = value['content']
                 else:
                     content = None
 
