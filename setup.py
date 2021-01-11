@@ -3,8 +3,10 @@ from setuptools import setup
 from fastapi_rss import __version__
 
 
-with open('requirements.txt', 'r') as f:
-    requirements = [line for line in f]
+requirements = [
+    'fastapi',
+    'lxml'
+]
 
 with open('readme.md', 'r') as f:
     readme = f.read()
