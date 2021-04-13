@@ -7,6 +7,7 @@ from fastapi_rss.models.category import Category
 from fastapi_rss.models.enclosure import Enclosure
 from fastapi_rss.models.guid import GUID
 from fastapi_rss.models.source import Source
+from fastapi_rss.models.itunes import Itunes
 
 
 class Item(BaseModel):
@@ -20,3 +21,4 @@ class Item(BaseModel):
     guid: Optional[GUID]
     pub_date: Optional[datetime.datetime]
     source: Optional[Source]
+    itunes: Optional[Itunes]
