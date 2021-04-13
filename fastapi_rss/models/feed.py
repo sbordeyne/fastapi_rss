@@ -37,6 +37,7 @@ class RSSFeed(BaseModel):
 
     item: List[Item] = []
 
+    ##
     @staticmethod
     def generate_tree(root, dict_):  # TODO: improve that shiete
         for key, value in dict_.items():
@@ -58,6 +59,10 @@ class RSSFeed(BaseModel):
                     attrs = value.attrs.dict()
                 elif 'attrs' in value:
                     attrs = value['attrs']
+                    if 'length' in attrs:
+                        # overriding length to be a string, because SubElement ( first below )
+                        #   doesn't like ints ( i.e. length of podcast in an int )
+                        attrs['length'] = str(attrs['length'])
                 else:
                     attrs = {}
 
@@ -67,6 +72,11 @@ class RSSFeed(BaseModel):
                     content = value['content']
                 else:
                     content = None
+
+                # used for podcast image
+                if key == 'itunes':
+                    element = etree.SubElement( root, '{http://www.itunes.com/dtds/podcast-1.0.dtd}image', attrs)
+                    continue
 
                 element = etree.SubElement(root, to_camelcase(key), attrs)
                 if content:
@@ -79,7 +89,10 @@ class RSSFeed(BaseModel):
             element.text = str(value)
 
     def tostring(self):
-        rss = etree.Element('rss', version='2.0')
+        nsmap = {
+            'itunes': "http://www.itunes.com/dtds/podcast-1.0.dtd"
+        }
+        rss = etree.Element('rss', version='2.0', nsmap=nsmap)
         channel = etree.SubElement(rss, 'channel')
         RSSFeed.generate_tree(channel, self.dict())
         return etree.tostring(rss, pretty_print=True)
