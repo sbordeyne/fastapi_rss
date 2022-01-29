@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Any, Optional, List, Union
 
 from fastapi import __version__ as faversion
 from lxml import etree
@@ -38,45 +38,63 @@ class RSSFeed(BaseModel):
     item: List[Item] = []
 
     @staticmethod
-    def generate_tree(root, dict_):  # TODO: improve that shiete
+    def _generate_tree_list(root: etree.Element, key: str, value: List[dict]) -> None:
+        for item in value:
+            attrs = item.pop('attrs', {})
+            content = item.pop('content', None)
+            itemroot = etree.SubElement(root, to_camelcase(key), attrs)
+            if content is not None:
+                itemroot.text = content
+            else:
+                RSSFeed.generate_tree(itemroot, item)
+
+    @staticmethod
+    def _generate_tree_object(root: etree.Element, key: str, value: Union[dict, BaseModel]) -> None:
+        if hasattr(value, 'attrs'):
+            attrs = value.attrs.dict()
+        elif 'attrs' in value:
+            attrs = value['attrs']
+        else:
+            attrs = {}
+
+        if hasattr(value, 'content'):
+            content = value.content
+        elif 'content' in value:
+            content = value['content']
+        else:
+            content = None
+
+        element = etree.SubElement(root, to_camelcase(key), attrs)
+        if content:
+            element.text = content
+
+    @staticmethod
+    def _generate_tree_datetime(root: etree.Element, key: str, value: datetime) -> None:
+        value = value.strftime('%a, %d %b %Y %H:%M:%S GMT')
+        element = etree.SubElement(root, to_camelcase(key))
+        element.text = str(value)
+
+    @staticmethod
+    def _generate_tree_default(root: etree.Element, key: str, value: Any) -> None:
+        element = etree.SubElement(root, to_camelcase(key))
+        element.text = str(value)
+
+    @staticmethod
+    def generate_tree(root: etree.Element, dict_: dict):
+        handlers = {
+            (list, ): RSSFeed._generate_tree_list,
+            (BaseModel, dict): RSSFeed._generate_tree_object,
+            (datetime, ): RSSFeed._generate_tree_datetime
+        }
         for key, value in dict_.items():
             if value is None:
                 continue
-            if isinstance(value, list):
-                for item in value:
-                    attrs = item.pop('attrs', {})
-                    content = item.pop('content', None)
-                    itemroot = etree.SubElement(root, to_camelcase(key), attrs)
-                    if content is not None:
-                        itemroot.text = content
-                    else:
-                        RSSFeed.generate_tree(itemroot, item)
-                continue
-
-            if isinstance(value, BaseModel) or isinstance(value, dict):
-                if hasattr(value, 'attrs'):
-                    attrs = value.attrs.dict()
-                elif 'attrs' in value:
-                    attrs = value['attrs']
-                else:
-                    attrs = {}
-
-                if hasattr(value, 'content'):
-                    content = value.content
-                elif 'content' in value:
-                    content = value['content']
-                else:
-                    content = None
-
-                element = etree.SubElement(root, to_camelcase(key), attrs)
-                if content:
-                    element.text = content
-                continue
-
-            if isinstance(value, datetime):
-                value = value.strftime('%a, %d %b %Y %H:%M:%S GMT')
-            element = etree.SubElement(root, to_camelcase(key))
-            element.text = str(value)
+            for handler_types, handler in handlers.items():
+                if isinstance(value, handler_types):
+                    handler(root, key, value)
+                    break
+            else:
+                RSSFeed._generate_tree_default(root, key, value)
 
     def tostring(self):
         rss = etree.Element('rss', version='2.0')

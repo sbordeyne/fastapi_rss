@@ -1,0 +1,48 @@
+[tool.poetry]
+name = "fastapi_rss"
+version = "0.1.4"
+description = "A library to generate RSS feeds for FastAPI"
+authors = ["Dogeek"]
+license = "MIT"
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+fastapi = "^0.73.0"
+lxml = "^4.7.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+pylama = "^8.3.7"
+yapf = "^0.32.0"
+isort = "^5.10.1"
+requests = "^2.27.1"
+poethepoet = "^0.12.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.yapf]
+based_on_style = 'pep8'
+spaces_before_comment = 2
+split_before_logical_operator = true
+split_before_arithmetic_operator = true
+split_before_bitwise_operator = true
+split_complex_comprehension = true
+split_before_first_argument = true
+split_before_dot = true
+split_before_dict_set_operator = true
+split_before_closing_bracket = true
+each_dict_entry_on_separate_line = true
+dedent_closing_brackets = true
+column_limit = 119
+coalesce_brackets = true

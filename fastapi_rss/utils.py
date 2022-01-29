@@ -1,7 +1,4 @@
-import datetime
-import getpass
 import locale
-import os
 import subprocess
 
 
