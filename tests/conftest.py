@@ -3,7 +3,6 @@ from textwrap import dedent
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from lxml import etree
 from pytest import fixture
 
 from fastapi_rss import (
@@ -14,7 +13,8 @@ from fastapi_rss import (
 
 @fixture
 def expected_response():
-    return '''\
+    return dedent('''\
+        <?xml version='1.0' encoding='ASCII'?>
         <rss version="2.0">
         <channel>
             <title>Scripting News</title>
@@ -40,7 +40,7 @@ def expected_response():
             </item>
         </channel>
         </rss>
-        '''.replace(' ', '').replace('\n', '')
+        ''')
 
 
 async def first():

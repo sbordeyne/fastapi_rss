@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Optional, List, Union
+from typing import Any, Dict, Optional, List, Union
 
 from fastapi import __version__ as faversion
 from lxml import etree
@@ -54,7 +54,7 @@ class RSSFeed(BaseModel):
             attrs = value.attrs.dict()
         elif 'attrs' in value:
             attrs = value['attrs']
-            if 'length' in attrs:
+            if attrs is not None and 'length' in attrs:
                 # overriding length to be a string, because SubElement ( first below )
                 # doesn't like ints ( i.e. length of podcast in an int )
                 attrs['length'] = str(attrs['length'])
@@ -108,10 +108,8 @@ class RSSFeed(BaseModel):
             else:
                 RSSFeed._generate_tree_default(root, key, value)
 
-    def tostring(self):
-        nsmap = {
-            'itunes': "http://www.itunes.com/dtds/podcast-1.0.dtd"
-        }
+    def tostring(self, nsmap: Optional[Dict[str, str]] = None):
+        nsmap = nsmap or {}
         rss = etree.Element('rss', version='2.0', nsmap=nsmap)
         channel = etree.SubElement(rss, 'channel')
         RSSFeed.generate_tree(channel, self.dict())

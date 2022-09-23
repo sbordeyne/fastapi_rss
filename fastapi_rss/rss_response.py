@@ -40,5 +40,10 @@ class RSSResponse(Response):
                 headers[headername] = newheaders[headername]
         super().init_headers(headers)
 
-    def render(self, rss: RSSFeed) -> bytes:
-        return rss.tostring()
+    def render(self, rss: RSSFeed, itunes: bool = False) -> bytes:
+        nsmap = None
+        if itunes:
+            nsmap = {
+                'itunes': "http://www.itunes.com/dtds/podcast-1.0.dtd"
+            }
+        return rss.tostring(nsmap)
