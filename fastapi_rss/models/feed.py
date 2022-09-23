@@ -49,11 +49,15 @@ class RSSFeed(BaseModel):
                 RSSFeed.generate_tree(itemroot, item)
 
     @staticmethod
-    def _generate_tree_object(root: etree.Element, key: str, value: Union[dict, BaseModel]) -> None:
+    def _generate_tree_object(root: etree._Element, key: str, value: Union[dict, BaseModel]) -> None:
         if hasattr(value, 'attrs'):
             attrs = value.attrs.dict()
         elif 'attrs' in value:
             attrs = value['attrs']
+            if 'length' in attrs:
+                # overriding length to be a string, because SubElement ( first below )
+                # doesn't like ints ( i.e. length of podcast in an int )
+                attrs['length'] = str(attrs['length'])
         else:
             attrs = {}
 
@@ -64,19 +68,27 @@ class RSSFeed(BaseModel):
         else:
             content = None
 
-        element = etree.SubElement(root, to_camelcase(key), attrs)
+        if key == 'itunes':
+            # Used for podcast image
+            element: etree._Element = etree.SubElement(
+                root, '{http://www.itunes.com/dtds/podcast-1.0.dtd}image',
+                attrs,
+            )
+            return
+
+        element: etree._Element = etree.SubElement(root, to_camelcase(key), attrs)
         if content:
             element.text = content
 
     @staticmethod
-    def _generate_tree_datetime(root: etree.Element, key: str, value: datetime) -> None:
+    def _generate_tree_datetime(root: etree._Element, key: str, value: datetime) -> None:
         value = value.strftime('%a, %d %b %Y %H:%M:%S GMT')
-        element = etree.SubElement(root, to_camelcase(key))
+        element: etree._Element = etree.SubElement(root, to_camelcase(key))
         element.text = str(value)
 
     @staticmethod
-    def _generate_tree_default(root: etree.Element, key: str, value: Any) -> None:
-        element = etree.SubElement(root, to_camelcase(key))
+    def _generate_tree_default(root: etree._Element, key: str, value: Any) -> None:
+        element: etree._Element = etree.SubElement(root, to_camelcase(key))
         element.text = str(value)
 
     @staticmethod
@@ -97,7 +109,10 @@ class RSSFeed(BaseModel):
                 RSSFeed._generate_tree_default(root, key, value)
 
     def tostring(self):
-        rss = etree.Element('rss', version='2.0')
+        nsmap = {
+            'itunes': "http://www.itunes.com/dtds/podcast-1.0.dtd"
+        }
+        rss = etree.Element('rss', version='2.0', nsmap=nsmap)
         channel = etree.SubElement(rss, 'channel')
         RSSFeed.generate_tree(channel, self.dict())
         return etree.tostring(rss, pretty_print=True, xml_declaration=True)
