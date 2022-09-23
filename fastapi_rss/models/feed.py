@@ -100,4 +100,4 @@ class RSSFeed(BaseModel):
         rss = etree.Element('rss', version='2.0')
         channel = etree.SubElement(rss, 'channel')
         RSSFeed.generate_tree(channel, self.dict())
-        return etree.tostring(rss, pretty_print=True)
+        return etree.tostring(rss, pretty_print=True, xml_declaration=True)
