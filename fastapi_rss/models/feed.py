@@ -109,7 +109,7 @@ class RSSFeed(BaseModel):
                 RSSFeed._generate_tree_default(root, key, value)
 
     def tostring(self, nsmap: Optional[Dict[str, str]] = None):
-        nsmap = nsmap or {}
+        nsmap = nsmap or {'atom': 'http://www.w3.org/2005/Atom'}
         rss = etree.Element('rss', version='2.0', nsmap=nsmap)
         channel = etree.SubElement(rss, 'channel')
         RSSFeed.generate_tree(channel, self.dict())
