@@ -46,7 +46,7 @@ class RSSFeed(BaseModel):
             if content is not None:
                 itemroot.text = content
             else:
-                RSSFeed.generate_tree(itemroot, item)
+                RSSFeed.generate_tree(itemroot, item, {})
 
     @staticmethod
     def _generate_tree_object(root: etree._Element, key: str, value: Union[dict, BaseModel]) -> None:
@@ -92,7 +92,7 @@ class RSSFeed(BaseModel):
         element.text = str(value)
 
     @staticmethod
-    def generate_tree(root: etree.Element, dict_: dict):
+    def generate_tree(root: etree.Element, dict_: dict, nsmap: dict):
         handlers = {
             (list, ): RSSFeed._generate_tree_list,
             (BaseModel, dict): RSSFeed._generate_tree_object,
@@ -107,17 +107,15 @@ class RSSFeed(BaseModel):
                     break
             else:
                 RSSFeed._generate_tree_default(root, key, value)
+                if key == "docs" and 'http://www.w3.org/2005/Atom' in nsmap.values():
+                    atom_link = etree.SubElement(root, '{http://www.w3.org/2005/Atom}link', nsmap=nsmap)
+                    atom_link.set('href', value)
+                    atom_link.set('rel', 'self')
+                    atom_link.set('type', 'application/rss+xml')
 
     def tostring(self, nsmap: Optional[Dict[str, str]] = None):
         nsmap = nsmap or {'atom': 'http://www.w3.org/2005/Atom'}
         rss = etree.Element('rss', version='2.0', nsmap=nsmap)
         channel = etree.SubElement(rss, 'channel')
-        RSSFeed.generate_tree(channel, self.dict())
-
-        if "docs" in self.dict().keys() and 'http://www.w3.org/2005/Atom' in nsmap.values():
-            atom_link = etree.SubElement(channel, '{http://www.w3.org/2005/Atom}link', nsmap=nsmap)
-            atom_link.set('href', self.dict()['docs'])
-            atom_link.set('rel', 'self')
-            atom_link.set('type', 'application/rss+xml')
-
+        RSSFeed.generate_tree(channel, self.dict(), nsmap)
         return etree.tostring(rss, pretty_print=True, xml_declaration=True, encoding='UTF-8')
