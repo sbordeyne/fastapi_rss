@@ -113,4 +113,11 @@ class RSSFeed(BaseModel):
         rss = etree.Element('rss', version='2.0', nsmap=nsmap)
         channel = etree.SubElement(rss, 'channel')
         RSSFeed.generate_tree(channel, self.dict())
+
+        if "docs" in self.dict().keys() and 'http://www.w3.org/2005/Atom' in nsmap.values():
+            atom_link = etree.SubElement(channel, '{http://www.w3.org/2005/Atom}link', nsmap=nsmap)
+            atom_link.set('href', self.dict()['docs'])
+            atom_link.set('rel', 'self')
+            atom_link.set('type', 'application/rss+xml')
+
         return etree.tostring(rss, pretty_print=True, xml_declaration=True, encoding='UTF-8')
