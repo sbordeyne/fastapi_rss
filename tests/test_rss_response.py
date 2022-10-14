@@ -8,7 +8,7 @@ def test_rss_sample_response(client: TestClient, expected_response: str, capsys)
     response = client.get('/1')
     assert response.status_code == 200
     tree = etree.fromstring(response.content)
-    pretty: str = etree.tostring(tree, pretty_print=True, xml_declaration=True).decode('ascii')
+    pretty: str = etree.tostring(tree, pretty_print=True, xml_declaration=True).decode('utf-8')
     for line, expected_line in zip(pretty.splitlines(), expected_response.splitlines()):
         assert dedent(line) == dedent(expected_line), f'{line} != {expected_line}'
 
