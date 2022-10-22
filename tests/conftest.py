@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from pytest import fixture
 
 from fastapi_rss import (
-    RSSFeed, RSSResponse, Item, Category,
+    Enclosure, EnclosureAttrs, GUIDAttrs, RSSFeed, RSSResponse, Item, Category,
     CategoryAttrs, GUID,
 )
 
@@ -24,7 +24,7 @@ def expected_response():
             <copyright>Copyright 1997-2002 Dave Winer</copyright>
             <managingEditor>dave@userland.com</managingEditor>
             <webmaster>dave@userland.com</webmaster>
-            <lastBuildDate>Mon, 30 Sep 2002 11:00:00 GMT</lastBuildDate>
+            <lastBuildDate>Mon, 30 Sep 2002 11:00:00 +0000</lastBuildDate>
             <category domain="Syndic8">1765</category>
             <generator>Radio UserLand v8.0.5</generator>
             <docs>http://backend.userland.com/rss</docs>
@@ -98,7 +98,15 @@ async def second():
                     year=2020, month=12, day=31,
                     hour=12, minute=40, second=16,
                 ),
-                guid=GUID(content='abcdefghijklmnopqrstuvwxyz')
+                guid=GUID(
+                    content='abcdefghijklmnopqrstuvwxyz',
+                    attrs=GUIDAttrs(is_permalink=False)
+                ),
+                enclosure=Enclosure(attrs=EnclosureAttrs(
+                    url="https://example.com/",
+                    length=125,
+                    type="audio/mpeg"
+                ))
             )
         ],
     }
