@@ -9,6 +9,7 @@ from fastapi_rss.models.guid import GUID
 from fastapi_rss.models.itunes import Itunes
 from fastapi_rss.models.source import Source
 
+
 class Item(BaseModel):
     title: str
     link: Optional[str]
