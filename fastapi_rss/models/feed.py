@@ -1,17 +1,18 @@
 from datetime import datetime
-from typing import Any, Dict, Optional, List, Union
+from email.utils import format_datetime
+from typing import Any, Dict, List, Optional, Union
 
 from fastapi import __version__ as faversion
 from lxml import etree
 from pydantic import BaseModel
 
 from fastapi_rss import __version__ as farssversion
-from fastapi_rss.utils import get_locale_code, to_camelcase
 from fastapi_rss.models.category import Category
 from fastapi_rss.models.cloud import Cloud
 from fastapi_rss.models.image import Image
-from fastapi_rss.models.textinput import TextInput
 from fastapi_rss.models.item import Item
+from fastapi_rss.models.textinput import TextInput
+from fastapi_rss.utils import get_locale_code, to_camelcase
 
 
 class RSSFeed(BaseModel):
@@ -26,8 +27,8 @@ class RSSFeed(BaseModel):
     pub_date: Optional[datetime]
     last_build_date: Optional[datetime]
     category: Optional[List[Category]]
-    generator: str = f'FastAPI v{faversion} w/ FastAPI_RSS v{farssversion}'
-    docs: str = 'https://validator.w3.org/feed/docs/rss2.html'
+    generator: str = f"FastAPI v{faversion} w/ FastAPI_RSS v{farssversion}"
+    docs: str = "https://validator.w3.org/feed/docs/rss2.html"
     cloud: Optional[Cloud]
     ttl: int = 60
     image: Optional[Image]
@@ -38,79 +39,89 @@ class RSSFeed(BaseModel):
     item: List[Item] = []
 
     @staticmethod
-    def _generate_tree_list(root: etree.Element, key: str, value: List[dict]) -> None:
-        for item in value:
-            attrs = item.pop('attrs', {})
-            content = item.pop('content', None)
-            itemroot = etree.SubElement(root, to_camelcase(key), attrs)
-            if content is not None:
-                itemroot.text = content
-            else:
-                RSSFeed.generate_tree(itemroot, item)
+    def _get_attrs(value: Union[dict, BaseModel]) -> Dict[str, str]:
+        """
+        Gets attrs from value, keys are passed to camel case and values to str
 
-    @staticmethod
-    def _generate_tree_object(root: etree._Element, key: str, value: Union[dict, BaseModel]) -> None:
-        if hasattr(value, 'attrs'):
+        :return: Attrs as dictionary
+        """
+        if hasattr(value, "attrs"):
             attrs = value.attrs.dict()
-        elif 'attrs' in value:
-            attrs = value['attrs']
-            if attrs is not None and 'length' in attrs:
-                # overriding length to be a string, because SubElement ( first below )
-                # doesn't like ints ( i.e. length of podcast in an int )
-                attrs['length'] = str(attrs['length'])
+        elif "attrs" in value:
+            attrs = value["attrs"]
         else:
             attrs = {}
 
-        if hasattr(value, 'content'):
+        # if boolean then string in lower case
+        return {
+            to_camelcase(k): str(v).lower() if isinstance(v, bool) else str(v)
+            for k, v in attrs.items()
+        }
+
+    @classmethod
+    def _generate_tree_list(cls, root: etree.ElementBase, key: str,
+                            value: List[dict]) -> None:
+        for item in value:
+            attrs = cls._get_attrs(item)
+            content = item.pop("content", None)
+            itemroot = etree.SubElement(root, key, attrs)
+            if content is not None:
+                itemroot.text = content
+            else:
+                cls.generate_tree(itemroot, item)
+
+    @classmethod
+    def _generate_tree_object(cls, root: etree.ElementBase, key: str,
+                              value: Union[dict, BaseModel]) -> None:
+        attrs = cls._get_attrs(value)
+        if hasattr(value, "content"):
             content = value.content
-        elif 'content' in value:
-            content = value['content']
+        elif "content" in value:
+            content = value["content"]
         else:
             content = None
 
         if key == 'itunes':
             # Used for podcast image
-            element: etree._Element = etree.SubElement(
-                root, '{http://www.itunes.com/dtds/podcast-1.0.dtd}image',
+            etree.SubElement(
+                root, "{http://www.itunes.com/dtds/podcast-1.0.dtd}image",
                 attrs,
             )
             return
 
-        element: etree._Element = etree.SubElement(root, to_camelcase(key), attrs)
+        element: etree.ElementBase = etree.SubElement(root, key, attrs)
         if content:
             element.text = content
 
     @staticmethod
-    def _generate_tree_datetime(root: etree._Element, key: str, value: datetime) -> None:
-        value = value.strftime('%a, %d %b %Y %H:%M:%S GMT')
-        element: etree._Element = etree.SubElement(root, to_camelcase(key))
-        element.text = str(value)
+    def _generate_tree_default(root: etree.ElementBase, key: str, value: Any) -> None:
+        element: etree.ElementBase = etree.SubElement(root, key)
+        if isinstance(value, datetime):
+            # parse datetime as specified in RFC 2822
+            value = format_datetime(value)
+        else:
+            value = str(value)
+        element.text = value
 
-    @staticmethod
-    def _generate_tree_default(root: etree._Element, key: str, value: Any) -> None:
-        element: etree._Element = etree.SubElement(root, to_camelcase(key))
-        element.text = str(value)
-
-    @staticmethod
-    def generate_tree(root: etree.Element, dict_: dict):
+    @classmethod
+    def generate_tree(cls, root: etree.Element, dict_: dict):
         handlers = {
-            (list, ): RSSFeed._generate_tree_list,
-            (BaseModel, dict): RSSFeed._generate_tree_object,
-            (datetime, ): RSSFeed._generate_tree_datetime
+            (list,): cls._generate_tree_list,
+            (BaseModel, dict): cls._generate_tree_object,
         }
         for key, value in dict_.items():
             if value is None:
                 continue
-            for handler_types, handler in handlers.items():
+            handler = cls._generate_tree_default
+            for handler_types, _handler in handlers.items():
                 if isinstance(value, handler_types):
-                    handler(root, key, value)
+                    handler = _handler
                     break
-            else:
-                RSSFeed._generate_tree_default(root, key, value)
+            handler(root, to_camelcase(key), value)
 
     def tostring(self, nsmap: Optional[Dict[str, str]] = None):
         nsmap = nsmap or {}
-        rss = etree.Element('rss', version='2.0', nsmap=nsmap)
-        channel = etree.SubElement(rss, 'channel')
-        RSSFeed.generate_tree(channel, self.dict())
+        rss = etree.Element("rss", version="2.0", nsmap=nsmap)
+        channel = etree.SubElement(rss, "channel")
+        self.generate_tree(channel, self.dict())
         return etree.tostring(rss, pretty_print=True, xml_declaration=True)
