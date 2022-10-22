@@ -27,8 +27,8 @@ class RSSFeed(BaseModel):
     pub_date: Optional[datetime]
     last_build_date: Optional[datetime]
     category: Optional[List[Category]]
-    generator: str = f"FastAPI v{faversion} w/ FastAPI_RSS v{farssversion}"
-    docs: str = "https://validator.w3.org/feed/docs/rss2.html"
+    generator: str = f'FastAPI v{faversion} w/ FastAPI_RSS v{farssversion}'
+    docs: str = 'https://validator.w3.org/feed/docs/rss2.html'
     cloud: Optional[Cloud]
     ttl: int = 60
     image: Optional[Image]
@@ -46,10 +46,10 @@ class RSSFeed(BaseModel):
         :return: Attrs as dictionary
         '''
         attrs = None
-        if hasattr(value, "attrs"):
+        if hasattr(value, 'attrs'):
             attrs = value.attrs.dict()
-        elif "attrs" in value:
-            attrs = value["attrs"]
+        elif 'attrs' in value:
+            attrs = value['attrs']
 
         attrs = attrs or {}
 
@@ -64,7 +64,7 @@ class RSSFeed(BaseModel):
                             value: List[dict]) -> None:
         for item in value:
             attrs = cls._get_attrs(item)
-            content = item.pop("content", None)
+            content = item.pop('content', None)
             itemroot = etree.SubElement(root, key, attrs)
             if content is not None:
                 itemroot.text = content
@@ -75,17 +75,17 @@ class RSSFeed(BaseModel):
     def _generate_tree_object(cls, root: etree.ElementBase, key: str,
                               value: Union[dict, BaseModel]) -> None:
         attrs = cls._get_attrs(value)
-        if hasattr(value, "content"):
+        if hasattr(value, 'content'):
             content = value.content
-        elif "content" in value:
-            content = value["content"]
+        elif 'content' in value:
+            content = value['content']
         else:
             content = None
 
         if key == 'itunes':
             # Used for podcast image
             etree.SubElement(
-                root, "{http://www.itunes.com/dtds/podcast-1.0.dtd}image",
+                root, '{http://www.itunes.com/dtds/podcast-1.0.dtd}image',
                 attrs,
             )
             return
@@ -122,7 +122,7 @@ class RSSFeed(BaseModel):
 
     def tostring(self, nsmap: Optional[Dict[str, str]] = None):
         nsmap = nsmap or {}
-        rss = etree.Element("rss", version="2.0", nsmap=nsmap)
-        channel = etree.SubElement(rss, "channel")
+        rss = etree.Element('rss', version='2.0', nsmap=nsmap)
+        channel = etree.SubElement(rss, 'channel')
         self.generate_tree(channel, self.dict())
         return etree.tostring(rss, pretty_print=True, xml_declaration=True)

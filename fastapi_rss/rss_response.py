@@ -44,6 +44,6 @@ class RSSResponse(Response):
         nsmap = None
         if itunes:
             nsmap = {
-                'itunes': "http://www.itunes.com/dtds/podcast-1.0.dtd"
+                'itunes': 'http://www.itunes.com/dtds/podcast-1.0.dtd'
             }
         return rss.tostring(nsmap)

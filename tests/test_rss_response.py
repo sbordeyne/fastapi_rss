@@ -19,7 +19,7 @@ def test_rss_guid(client: TestClient):
     assert response.status_code == 200
     assert tree.xpath('//guid') != []
     assert tree.xpath('//guid')[0].text == 'abcdefghijklmnopqrstuvwxyz'
-    assert tree.xpath('//guid')[0].attrib["isPermalink"] == "false"
+    assert tree.xpath('//guid')[0].attrib['isPermalink'] == 'false'
 
 
 def test_rss_enclosure(client: TestClient):
@@ -28,9 +28,9 @@ def test_rss_enclosure(client: TestClient):
     assert response.status_code == 200
     assert tree.xpath('//enclosure') != []
     enclosure = tree.xpath('//enclosure')[0].attrib
-    assert enclosure["url"] == "https://example.com/"
-    assert enclosure["length"] == "125"
-    assert enclosure["type"] == "audio/mpeg"
+    assert enclosure['url'] == 'https://example.com/'
+    assert enclosure['length'] == '125'
+    assert enclosure['type'] == 'audio/mpeg'
 
 
 def test_rss_item_category(client: TestClient):

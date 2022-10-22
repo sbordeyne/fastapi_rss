@@ -103,9 +103,9 @@ async def second():
                     attrs=GUIDAttrs(is_permalink=False)
                 ),
                 enclosure=Enclosure(attrs=EnclosureAttrs(
-                    url="https://example.com/",
+                    url='https://example.com/',
                     length=125,
-                    type="audio/mpeg"
+                    type='audio/mpeg'
                 ))
             )
         ],
