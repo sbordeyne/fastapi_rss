@@ -40,11 +40,11 @@ class RSSFeed(BaseModel):
 
     @staticmethod
     def _get_attrs(value: Union[dict, BaseModel]) -> Dict[str, str]:
-        """
+        '''
         Gets attrs from value, keys are passed to camel case and values to str
 
         :return: Attrs as dictionary
-        """
+        '''
         attrs = None
         if hasattr(value, "attrs"):
             attrs = value.attrs.dict()
