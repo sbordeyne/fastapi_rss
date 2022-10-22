@@ -45,12 +45,13 @@ class RSSFeed(BaseModel):
 
         :return: Attrs as dictionary
         """
+        attrs = None
         if hasattr(value, "attrs"):
             attrs = value.attrs.dict()
         elif "attrs" in value:
             attrs = value["attrs"]
-        else:
-            attrs = {}
+
+        attrs = attrs or {}
 
         # if boolean then string in lower case
         return {
