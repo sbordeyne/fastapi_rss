@@ -1,10 +1,9 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class CategoryAttrs(BaseModel):
-    domain: Optional[str]
     '''
     A string that identifies a categorization taxonomy.
     It's a forward-slash separated string which identifies
@@ -12,6 +11,7 @@ class CategoryAttrs(BaseModel):
 
     Processors may establish conventions for the interpretation of categories
     '''
+    domain: Optional[str]
 
 
 class Category(BaseModel):
