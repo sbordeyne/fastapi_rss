@@ -1,10 +1,12 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
 class EnclosureAttrs(BaseModel):
-    url: str
-    length: int
-    type: str
+    url: Optional[str] = None
+    length: Optional[int] = None
+    type: Optional[str] = None
 
 
 class Enclosure(BaseModel):

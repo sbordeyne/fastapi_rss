@@ -16,23 +16,23 @@ from fastapi_rss.utils import get_locale_code, to_camelcase
 
 
 class RSSFeed(BaseModel):
-    title: str
-    link: str
-    description: str
+    title: Optional[str] = None
+    link: Optional[str] = None
+    description: Optional[str] = None
 
-    language: str = get_locale_code()
-    copyright: Optional[str]
-    managing_editor: Optional[str]
-    webmaster: Optional[str]
-    pub_date: Optional[datetime]
-    last_build_date: Optional[datetime]
-    category: Optional[List[Category]]
-    generator: str = f'FastAPI v{faversion} w/ FastAPI_RSS v{farssversion}'
-    docs: str = 'https://validator.w3.org/feed/docs/rss2.html'
-    cloud: Optional[Cloud]
-    ttl: int = 60
-    image: Optional[Image]
-    text_input: Optional[TextInput]
+    language: Optional[str] = get_locale_code()
+    copyright: Optional[str] = None
+    managing_editor: Optional[str] = None
+    webmaster: Optional[str] = None
+    pub_date: Optional[datetime] = None
+    last_build_date: Optional[datetime] = None
+    category: Optional[List[Category]] = None
+    generator: Optional[str] = f"FastAPI v{faversion} w/ FastAPI_RSS v{farssversion}"
+    docs: Optional[str] = "https://validator.w3.org/feed/docs/rss2.html"
+    cloud: Optional[Cloud] = None
+    ttl: Optional[int] = 60
+    image: Optional[Image] = None
+    text_input: Optional[TextInput] = None
     skip_hours: List[int] = []
     skip_days: List[str] = []
 
@@ -40,16 +40,16 @@ class RSSFeed(BaseModel):
 
     @staticmethod
     def _get_attrs(value: Union[dict, BaseModel]) -> Dict[str, str]:
-        '''
+        """
         Gets attrs from value, keys are passed to camel case and values to str
 
         :return: Attrs as dictionary
-        '''
+        """
         attrs = None
-        if hasattr(value, 'attrs'):
+        if hasattr(value, "attrs"):
             attrs = value.attrs.dict()
-        elif 'attrs' in value:
-            attrs = value['attrs']
+        elif "attrs" in value:
+            attrs = value["attrs"]
 
         attrs = attrs or {}
 
@@ -60,11 +60,12 @@ class RSSFeed(BaseModel):
         }
 
     @classmethod
-    def _generate_tree_list(cls, root: etree.ElementBase, key: str,
-                            value: List[dict]) -> None:
+    def _generate_tree_list(
+        cls, root: etree.ElementBase, key: str, value: List[dict]
+    ) -> None:
         for item in value:
             attrs = cls._get_attrs(item)
-            content = item.pop('content', None)
+            content = item.pop("content", None)
             itemroot = etree.SubElement(root, key, attrs)
             if content is not None:
                 itemroot.text = content
@@ -72,20 +73,22 @@ class RSSFeed(BaseModel):
                 cls.generate_tree(itemroot, item)
 
     @classmethod
-    def _generate_tree_object(cls, root: etree.ElementBase, key: str,
-                              value: Union[dict, BaseModel]) -> None:
+    def _generate_tree_object(
+        cls, root: etree.ElementBase, key: str, value: Union[dict, BaseModel]
+    ) -> None:
         attrs = cls._get_attrs(value)
-        if hasattr(value, 'content'):
+        if hasattr(value, "content"):
             content = value.content
-        elif 'content' in value:
-            content = value['content']
+        elif "content" in value:
+            content = value["content"]
         else:
             content = None
 
-        if key == 'itunes':
+        if key == "itunes":
             # Used for podcast image
             etree.SubElement(
-                root, '{http://www.itunes.com/dtds/podcast-1.0.dtd}image',
+                root,
+                "{http://www.itunes.com/dtds/podcast-1.0.dtd}image",
                 attrs,
             )
             return
@@ -122,7 +125,7 @@ class RSSFeed(BaseModel):
 
     def tostring(self, nsmap: Optional[Dict[str, str]] = None):
         nsmap = nsmap or {}
-        rss = etree.Element('rss', version='2.0', nsmap=nsmap)
-        channel = etree.SubElement(rss, 'channel')
+        rss = etree.Element("rss", version="2.0", nsmap=nsmap)
+        channel = etree.SubElement(rss, "channel")
         self.generate_tree(channel, self.dict())
         return etree.tostring(rss, pretty_print=True, xml_declaration=True)

@@ -1,11 +1,11 @@
 import datetime
 
 from fastapi import FastAPI
+
 from fastapi_rss import (
     RSSFeed, RSSResponse, Item, Category,
     CategoryAttrs, GUID,
 )
-
 
 app = FastAPI()
 

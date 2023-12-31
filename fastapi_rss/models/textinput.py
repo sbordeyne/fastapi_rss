@@ -1,8 +1,10 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
 class TextInput(BaseModel):
-    title: str
-    description: str
-    name: str
-    link: str
+    title: Optional[str]
+    description: Optional[str]
+    name: Optional[str]
+    link: Optional[str]

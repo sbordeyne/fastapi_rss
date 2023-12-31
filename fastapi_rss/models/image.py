@@ -4,9 +4,9 @@ from pydantic import BaseModel
 
 
 class Image(BaseModel):
-    url: str
-    title: str
-    link: str
+    url: Optional[str]
+    title: Optional[str]
+    link: Optional[str]
 
     width: Optional[int]
     height: Optional[int]

@@ -4,9 +4,9 @@ from pydantic import BaseModel
 
 
 class ItunesAttrs(BaseModel):
-    href: str
+    href: Optional[str]
 
 
 class Itunes(BaseModel):
-    content: str
+    content: Optional[str]
     attrs: Optional[ItunesAttrs]

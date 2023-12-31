@@ -1,10 +1,12 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
 class SourceAttrs(BaseModel):
-    url: str
+    url: Optional[str]
 
 
 class Source(BaseModel):
-    content: str
+    content: Optional[str]
     attrs: SourceAttrs
