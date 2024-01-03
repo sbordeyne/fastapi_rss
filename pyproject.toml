@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi_rss"
-version = "0.2.1"
+version = "0.2.2"
 description = "A library to generate RSS feeds for FastAPI"
 authors = ["Dogeek"]
 license = "MIT"
@@ -15,7 +15,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 fastapi = ">=0.85.0,<1.0.0"
 lxml = "^4.7.1"
 
@@ -46,3 +46,6 @@ each_dict_entry_on_separate_line = true
 dedent_closing_brackets = true
 column_limit = 119
 coalesce_brackets = true
+
+[tool.pylint]
+max-line-length = 120

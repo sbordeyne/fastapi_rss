@@ -20,7 +20,7 @@ class RSSFeed(BaseModel):
     link: str
     description: str
 
-    language: str = get_locale_code()
+    language: Optional[str] = get_locale_code()
     copyright: Optional[str]
     managing_editor: Optional[str]
     webmaster: Optional[str]

@@ -1,9 +1,9 @@
 import hashlib
 from typing import Mapping
 
-from fastapi_rss.models import RSSFeed
-
 from starlette.responses import Response
+
+from fastapi_rss.models import RSSFeed
 
 
 class RSSResponse(Response):
@@ -16,7 +16,7 @@ class RSSResponse(Response):
     charset = 'utf-8'
 
     @property
-    def etag(self):
+    def etag(self) -> str:
         '''
         Generates a SHA1 sum of the body of the response so that the server can
         support the ETag protocol.
