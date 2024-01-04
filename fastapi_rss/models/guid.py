@@ -9,4 +9,4 @@ class GUIDAttrs(BaseModel):
 
 class GUID(BaseModel):
     content: str
-    attrs: Optional[GUIDAttrs]
+    attrs: Optional[GUIDAttrs] = None

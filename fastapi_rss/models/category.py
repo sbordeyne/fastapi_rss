@@ -11,7 +11,7 @@ class CategoryAttrs(BaseModel):
 
     Processors may establish conventions for the interpretation of categories
     '''
-    domain: Optional[str]
+    domain: Optional[str] = None
 
 
 class Category(BaseModel):
@@ -19,4 +19,4 @@ class Category(BaseModel):
     An optional sub-element of a channel or an item
     '''
     content: str
-    attrs: Optional[CategoryAttrs]
+    attrs: Optional[CategoryAttrs] = None

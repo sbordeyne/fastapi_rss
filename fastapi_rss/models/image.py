@@ -8,6 +8,6 @@ class Image(BaseModel):
     title: str
     link: str
 
-    width: Optional[int]
-    height: Optional[int]
-    description: Optional[str]
+    width: Optional[int] = None
+    height: Optional[int] = None
+    description: Optional[str] = None
