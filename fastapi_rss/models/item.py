@@ -12,13 +12,13 @@ from fastapi_rss.models.source import Source
 
 class Item(BaseModel):
     title: str
-    link: Optional[str]
-    description: Optional[str]
-    author: Optional[str]
-    category: Optional[Category]
-    comments: Optional[str]
-    enclosure: Optional[Enclosure]
-    guid: Optional[GUID]
-    pub_date: Optional[datetime.datetime]
-    source: Optional[Source]
-    itunes: Optional[Itunes]
+    link: Optional[str] = None
+    description: Optional[str] = None
+    author: Optional[str] = None
+    category: Optional[Category] = None
+    comments: Optional[str] = None
+    enclosure: Optional[Enclosure] = None
+    guid: Optional[GUID] = None
+    pub_date: Optional[datetime.datetime] = None
+    source: Optional[Source] = None
+    itunes: Optional[Itunes] = None

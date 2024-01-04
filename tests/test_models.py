@@ -4,8 +4,15 @@ from typing import TYPE_CHECKING
 
 import pytest
 from pydantic import BaseModel
+
 if TYPE_CHECKING:
     from pydantic.fields import ModelField
+
+pydantic_major = int(version('pydantic').split('.')[0])
+if pydantic_major >= 2:
+    from pydantic_core import PydanticUndefined
+else:
+    from pydantic.fields import UndefinedType as PydanticUndefined
 
 from fastapi_rss.models import (
     Category, CategoryAttrs,
@@ -22,10 +29,9 @@ from fastapi_rss.models import (
 
 MODELS = [i for i in locals().values() if inspect.isclass(i) and issubclass(i, BaseModel)]
 
+
 @pytest.mark.parametrize('model',MODELS)
 def test_optionals_have_defaults(model):
-    pydantic_major = int(version('pydantic').split('.')[0])
-
     if pydantic_major >= 2:
         fields = model.model_fields
     else:
@@ -34,7 +40,8 @@ def test_optionals_have_defaults(model):
     field: 'ModelField'
     for name, field in fields.items():
         if not field.required:
-            assert field.field_info.default is None
+            assert field.field_info.default is not PydanticUndefined
+
 
 def test_instantiate_optionals():
     feed = RSSFeed(

@@ -9,4 +9,4 @@ class ItunesAttrs(BaseModel):
 
 class Itunes(BaseModel):
     content: str
-    attrs: Optional[ItunesAttrs]
+    attrs: Optional[ItunesAttrs] = None

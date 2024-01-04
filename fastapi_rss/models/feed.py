@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from fastapi import __version__ as faversion
 from lxml import etree
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from fastapi_rss import __version__ as farssversion
 from fastapi_rss.models.category import Category
@@ -21,22 +21,22 @@ class RSSFeed(BaseModel):
     description: str
 
     language: Optional[str] = get_locale_code()
-    copyright: Optional[str]
-    managing_editor: Optional[str]
-    webmaster: Optional[str]
-    pub_date: Optional[datetime]
-    last_build_date: Optional[datetime]
-    category: Optional[List[Category]]
+    copyright: Optional[str] = None
+    managing_editor: Optional[str] = None
+    webmaster: Optional[str] = None
+    pub_date: Optional[datetime] = None
+    last_build_date: Optional[datetime] = None
+    category: Optional[List[Category]] = Field(default_factory=list)
     generator: str = f'FastAPI v{faversion} w/ FastAPI_RSS v{farssversion}'
     docs: str = 'https://validator.w3.org/feed/docs/rss2.html'
-    cloud: Optional[Cloud]
+    cloud: Optional[Cloud] = None
     ttl: int = 60
-    image: Optional[Image]
-    text_input: Optional[TextInput]
-    skip_hours: List[int] = []
-    skip_days: List[str] = []
+    image: Optional[Image] = None
+    text_input: Optional[TextInput] = None
+    skip_hours: List[int] = Field(default_factory=list)
+    skip_days: List[str] = Field(default_factory=list)
 
-    item: List[Item] = []
+    item: List[Item] = Field(default_factory=list)
 
     @staticmethod
     def _get_attrs(value: Union[dict, BaseModel]) -> Dict[str, str]:
