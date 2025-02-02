@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi_rss"
-version = "0.2.2"
+version = "0.3.0"
 description = "A library to generate RSS feeds for FastAPI"
 authors = ["Dogeek"]
 license = "MIT"
@@ -17,11 +17,11 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8"
 fastapi = ">=0.85.0,<1.0.0"
-lxml = "^4.7.1"
+lxml = "^5.3.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
-pylama = "^8.3.7"
+pylama = "^8.4.1"
 yapf = "^0.32.0"
 isort = "^5.10.1"
 requests = "^2.27.1"
