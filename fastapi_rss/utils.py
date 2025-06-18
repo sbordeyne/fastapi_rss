@@ -48,9 +48,14 @@ def to_camelcase(string: str) -> str:
     :return: the camelcased string
     :rtype: str
     """
-    string = string.split('_')
-    for i, el in enumerate(string):
+    # Add a special case for the is_permalink string, RSS expects "isPermaLink"
+    # but this function would return "isPermalink" instead.
+    # @see issue #13 https://github.com/sbordeyne/fastapi_rss/issues/13
+    if string == 'is_permalink':
+        return 'isPermaLink'
+    parts = string.split('_')
+    for i, el in enumerate(parts):
         if i == 0:
             continue
-        string[i] = el.capitalize()
-    return ''.join(string)
+        parts[i] = el.capitalize()
+    return ''.join(parts)
